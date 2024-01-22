@@ -62,7 +62,20 @@ B1RunAction::B1RunAction()
   // Register accumulable to the accumulable manager
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->RegisterAccumulable(fEdep);
-  accumulableManager->RegisterAccumulable(fEdep2); 
+  accumulableManager->RegisterAccumulable(fEdep2);
+
+  // create file
+  auto analysisManager =G4AnalysisManager::Instance();
+  G4cout << "Using " <<analysisManager->GetType() << G4endl;
+  //analysisManager->SetNtupleMerging(true);
+  analysisManager->SetVerboseLevel(1);
+  analysisManager->SetFileName("G4B1_p_momentum");
+  //analysisManager->CreateH1("Eabs","Edepin absorber", 100, 0., 200*MeV);
+  //analysisManager->CreateH3("Eabstest","Edepin test", 100, 0., 200*MeV,100, 0., 200*MeV,100, 0., 200*MeV);
+  analysisManager->CreateNtuple("tree","p_momentum");
+  analysisManager->CreateNtupleDColumn("p_momentum");
+  //analysisManager->CreateNtupleDColumn("Eabs");
+  analysisManager->FinishNtuple();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -80,6 +93,9 @@ void B1RunAction::BeginOfRunAction(const G4Run*)
   // reset accumulables to their initial values
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
+  auto analysisManager =G4AnalysisManager::Instance();
+  // Open an output file, its name can beoverwritten in a macro
+  analysisManager->OpenFile();
 
 }
 
@@ -145,9 +161,15 @@ void B1RunAction::EndOfRunAction(const G4Run* run)
      << " Cumulated dose per run, in scoring volume : " 
      << G4BestUnit(dose,"Dose") << " rms = " << G4BestUnit(rmsDose,"Dose")
      << G4endl
+     << " number of events:" << fMomentum.size()
+     << G4endl
      << "------------------------------------------------------------"
      << G4endl
      << G4endl;
+  auto analysisManager =G4AnalysisManager::Instance();
+  analysisManager->Write();
+  analysisManager->CloseFile();
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

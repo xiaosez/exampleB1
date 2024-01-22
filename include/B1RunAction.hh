@@ -33,6 +33,7 @@
 #include "G4UserRunAction.hh"
 #include "G4Accumulable.hh"
 #include "globals.hh"
+#include "g4root.hh"
 
 class G4Run;
 
@@ -52,7 +53,8 @@ class B1RunAction : public G4UserRunAction
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
 
-    void AddEdep (G4double edep); 
+    void AddEdep (G4double edep);
+    std::vector<double> fMomentum;
 
   private:
     G4Accumulable<G4double> fEdep;

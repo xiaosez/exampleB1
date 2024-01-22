@@ -51,6 +51,12 @@ B1EventAction::~B1EventAction()
 void B1EventAction::BeginOfEventAction(const G4Event*)
 {    
   fEdep = 0.;
+  fTime = {};
+  fPositionx = {};
+  fPositiony = {};
+  fPositionz = {};
+//  G4cout << "-----------------" << G4endl;
+//  G4cout << "event begin" << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -59,6 +65,36 @@ void B1EventAction::EndOfEventAction(const G4Event*)
 {   
   // accumulate statistics in run action
   fRunAction->AddEdep(fEdep);
+  G4cout << "event end" << G4endl;
+  int trackNum = fTime.size();
+  if(trackNum != 0) {
+      auto analysisManager =G4AnalysisManager::Instance();
+      G4cout << "Time is:" << fTime[0] << G4endl;
+      G4cout << "delta Time is:" << fTime[trackNum-1]- fTime[0] << G4endl;
+      double deltaTime = fTime[trackNum-1]- fTime[0];
+      //std::cout << "positionx: " << fPositionx[0] << std::endl;
+      //std::cout << "positionx: " << fPositionx[fPositionx.size()-1] << std::endl;
+      double deltaX = fPositionx[trackNum-1] - fPositionx[0];
+      double deltaY = fPositiony[trackNum-1] - fPositiony[0];
+      double deltaZ = fPositionz[trackNum-1] - fPositionz[0];
+
+      double ProtonMomentum = calculateMomentum(deltaTime,deltaX,deltaY,deltaZ);
+      analysisManager->FillNtupleDColumn(0,ProtonMomentum);
+      analysisManager->AddNtupleRow();
+      fRunAction->fMomentum.push_back(ProtonMomentum);
+
+  }
+  G4cout << "-------------------" << G4endl;
+
+}
+
+double B1EventAction::calculateMomentum(double time, double dx, double dy, double dz) {
+    double dis = sqrt(dx*dx + dy*dy + dz*dz)*1e-3;
+    double speed = dis/(time*1e-9);
+    std::cout << "speed is:" << speed << std::endl;
+    double gamma = speed/299792458;
+    std::cout << "momentum is :" << 938.27208812*gamma*sqrt(1-gamma*gamma) << std::endl;
+    return 938.27208812*gamma*sqrt(1-gamma*gamma);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

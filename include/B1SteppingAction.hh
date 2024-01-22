@@ -52,6 +52,8 @@ class B1SteppingAction : public G4UserSteppingAction
   private:
     B1EventAction*  fEventAction;
     G4LogicalVolume* fScoringVolume;
+    //std::vector<double> Time ;
+    //std::vector<G4ThreeVector> Position;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

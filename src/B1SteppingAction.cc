@@ -65,9 +65,24 @@ void B1SteppingAction::UserSteppingAction(const G4Step *step) {
     // check if we are in scoring volume
     if (volume != fScoringVolume) return;
 
-    // collect energy deposited in this step
+    //    // collect energy deposited in this step
     G4double edepStep = step->GetTotalEnergyDeposit();
+    //G4double time = step->GetDeltaTime();
+    G4Track* track = step->GetTrack();
+    G4double globalTime = track->GetGlobalTime();
+    //Time.push_back(globalTime);
+    G4ThreeVector position = track->GetPosition();
+    //Position.emplace_back(position);
+    G4cout << "globalTime is:"<<globalTime << G4endl;
+    //G4ThreeVector position = step->GetDeltaPosition();
+    std::cout << "position is:" << "(" << position[0] << "," << position[1] << "," << position[2] << ")" << std::endl;
+    //std::cout << "time is: " << time << std::endl;
+
     fEventAction->AddEdep(edepStep);
+    fEventAction->fTime.push_back(globalTime);
+    fEventAction->fPositionx.emplace_back(position[0]);
+    fEventAction->fPositiony.emplace_back(position[1]);
+    fEventAction->fPositionz.emplace_back(position[2]);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
